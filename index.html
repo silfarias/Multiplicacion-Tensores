@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensor Multiplication</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.14.0"></script>
-    <title>Multiplicación de Tensores con TensorFlow.js</title>
-
 </head>
 <body>
     <div class="container mt-5">
         <div class="row">
             <div class="col">
-                <h1 class="text-center">Multiplicación de Tensores</h1>
+                <h1 class="text-center">TensorFlow - Multiplicación de Tensores</h1>
             </div>
         </div>
         <div class="row mt-3">
@@ -31,36 +29,40 @@
         </div>
     </div>
 
-    
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.14.0"></script>
 
     <script>
-        // Función para generar un tensor de tamaño 10x10 con números del 1 al 9
+        
         function generateTensor() {
-            const tensor = tf.tensor(tf.range(1, 101).arraySync().map(num => num % 9 + 1), [10, 10]);
-            return tensor;
+            return tf.randomUniform([10, 10], 1, 9, 'int32');
         }
 
-        // Mostrar información sobre la memoria
-        function logMemoryUsage(message) {
-            const memoryInfo = tf.memory();
-            console.log(message, memoryInfo.numBytes / (1024 * 1024), 'MB');
+      
+        function memoriaUsada(mensaje) {
+            const InfoMemoria = tf.memory();
+            console.log(mensaje, InfoMemoria.numBytes / (1024 * 1024), 'MB');
         }
 
-        // Multiplicar tensores hasta que la memoria utilizada supere los 64 MB
+        
         let totalMemoryUsed = 0;
         let iterations = 0;
 
-        async function multiplyTensors() {
+        while (totalMemoryUsed < 64 * 1024 * 1024) { // El bucle se ejecuta mientras la memoria usada sea menor que 64 MB
+
+            // Generamos dos tensores y realizamos la multiplicación
             const tensor1 = generateTensor();
             const tensor2 = generateTensor();
-            const result = tf.matMul(tensor1, tensor2);
+            const result = tf.matMul(tensor1, tensor2); // Obtenemos resultado
+
+            
             const memoryInfo = tf.memory();
             totalMemoryUsed = memoryInfo.numBytes;
-            logMemoryUsage(`Después de la iteración ${iterations + 1}:`);
-
+           
+            memoriaUsada(`Después de la iteración ${iterations + 1}:`);
+  
             const outputTable = document.getElementById('output');
             tf.tidy(() => {
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 10; i++) { 
                     const row = outputTable.insertRow();
                     for (let j = 0; j < 3; j++) {
                         const cell = row.insertCell();
@@ -74,17 +76,12 @@
                     }
                 }
             });
-
-            tf.dispose([tensor1, tensor2, result]);
-
-            if (totalMemoryUsed < 64 * 1024 * 1024) {
-                iterations++;
-                await multiplyTensors();
-            }
+            iterations++;
         }
 
-        // Llamar a la función para iniciar la multiplicación de tensores
-        multiplyTensors();
+        memoriaUsada("Antes de liberar la memoria:");
+        tf.disposeVariables();
+        memoriaUsada("Después de liberar la memoria:");
     </script>
 </body>
 </html>
