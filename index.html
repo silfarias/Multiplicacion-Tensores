@@ -10,7 +10,7 @@
     <div class="container mt-5">
         <div class="row">
             <div class="col">
-                <h1 class="text-center">TensorFlow - Multiplicación de Tensores</h1>
+                <h1 class="text-center"> TensorFlow - Multiplicación de Tensores </h1>
             </div>
         </div>
         <div class="row mt-3">
@@ -34,15 +34,17 @@
     <script>
         
         function generateTensor() {
-            return tf.randomUniform([10, 10], 1, 9, 'int32');
+            return tf.randomUniform([400, 400], 1, 9, 'int32');
         }
-
       
         function memoriaUsada(mensaje) {
             const InfoMemoria = tf.memory();
             console.log(mensaje, InfoMemoria.numBytes / (1024 * 1024), 'MB');
         }
 
+        function limpiarMemoria() {
+            tf.disposeVariables(); // Liberar tensores
+        }
         
         let totalMemoryUsed = 0;
         let iterations = 0;
@@ -59,6 +61,7 @@
             totalMemoryUsed = memoryInfo.numBytes;
            
             memoriaUsada(`Después de la iteración ${iterations + 1}:`);
+            limpiarMemoria(); // Liberar tensores después de cada iteración
   
             const outputTable = document.getElementById('output');
             tf.tidy(() => {
@@ -80,8 +83,9 @@
         }
 
         memoriaUsada("Antes de liberar la memoria:");
-        tf.disposeVariables();
+        limpiarMemoria(); // Liberar tensores después del bucle
         memoriaUsada("Después de liberar la memoria:");
+        
     </script>
 </body>
 </html>
